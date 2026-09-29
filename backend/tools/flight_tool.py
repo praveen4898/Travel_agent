@@ -18,9 +18,14 @@ def get_flights(city_iata: str, date: str):
         "access_key": api_key,
         "dep_iata": "DEL",
         "arr_iata": city_iata,
-        "flight_date": date
+        # The free tier of AviationStack does NOT support 'flight_date'
+        # So we omit it and fetch today's current flights for this route instead.
     }
 
     response = requests.get(url, params=params)
-
-    return response.json()
+    data = response.json()
+    
+    if "error" in data:
+        return f"Flight API Error: {data['error'].get('message', 'Unknown error')}"
+        
+    return data
